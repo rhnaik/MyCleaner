@@ -1,6 +1,6 @@
 # MyCleaner
 
-In a cloud test environment, engineers create test data and furgate to delete data. In cloud environment, as everything is chargable,
+In a cloud test environment, engineers create test data and forget to delete it after they are done with testing. In cloud environment, as everything is chargable,
 the stale data may incur lots of charges. Especially in case of snapshots of VM and database instances.
 
 This utility helps user to cleanup test data which is no longer required. Right now, this utility has a support for Azure storage blobs. 
