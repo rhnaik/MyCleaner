@@ -4,7 +4,7 @@ In a cloud test environment, engineers create test data and forget to delete it 
 the stale data may incur lots of charges. Especially in case of snapshots of VM and database instances.
 
 This utility helps user to cleanup test data which is no longer required. Right now, this utility has a support for Azure storage blobs. 
-This applicaation can easily extended for other cloud vendors, cloud objects, array vendors and file systems.
+This application can easily extended for other cloud vendors, cloud objects, array vendors and file systems.
 
 The user can delete files by defining variaous combination of data filter rules in JSON file. Right now, this utility support 2 types of rule
 
