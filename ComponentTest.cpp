@@ -1,15 +1,17 @@
 #include "ComponentTest.h"
 #include "AzureStorageApi.h"
 #include "Logger.h"
-#include "ErrorManager.h"
+#include "ErrorCode.h"
 #include "Rule.h"
+#include "RulePatternCheck.h"
+#include "RuleCheckLastModifiedTime.h"
 
 int componentTest()
 {
 	// Define the connection-string with your values.
-	const std::wstring azureStorageConnectionString = U("DefaultEndpointsProtocol=https;AccountName=rnaikstorage;AccountKey=HFhqpGiV2pA8utUo/91xgXHMJ1Sq1uMEN37EWE+smdE45Z8LG9ibR5sMtIEiJOWWX2xLwgey2l2Du7EdETBZmg==;EndpointSuffix=core.windows.net");
+	const std::wstring azureStorageConnectionString = U("test_connection_string");
 
-	// Create CAzureStorageApi objecct
+	// Create CAzureStorageApi object
 	CAzureStorageApi azureStorageApi(azureStorageConnectionString);
 
 	std::wstring containerName = U("my-sample-container");
@@ -18,27 +20,28 @@ int componentTest()
 
 	// Create blob
 	int retval = azureStorageApi.createBlob(containerName, blobName, sourceFilePath);
-	if (retval != EC_SUCCESS)
+	if (retval != E_SUCCESS)
 	{
 		LOG_MESSAGE(M_ERROR, __func__, "Failed to create blob with error:" << retval);
 	}
 
 	// Delete blob
 	retval = azureStorageApi.deleteBlob(containerName, blobName);
-	if (retval != EC_SUCCESS)
+	if (retval != E_SUCCESS)
 	{
 		LOG_MESSAGE(M_ERROR, __func__, "Failed to delete blob with error:" << retval);
 	}
 
-	// Delete blob which matches criteris
+	// Delete blob which matches criteria
 	std::time_t startLastModifiedTime = 1594500000;
 	std::time_t endLastModifiedTime = 1594505551;
 
-	CLastModifiedTimeCheckRule rule(RT_LAST_MODIFIED_TIME_CHECK, startLastModifiedTime, endLastModifiedTime);
+	//CLastModifiedTimeCheckRule rule(RT_LAST_MODIFIED_TIME_CHECK, startLastModifiedTime, endLastModifiedTime);
+	CLastModifiedTimeCheckRule rule;
 	std::vector<CRule*> ruleList;
 	ruleList.push_back(&rule);
 	retval = azureStorageApi.deleteBlobsWhichMatchRules(containerName, ruleList);
-	if (retval != EC_SUCCESS)
+	if (retval != E_SUCCESS)
 	{
 		LOG_MESSAGE(M_ERROR, __func__, "Failed to delete blobs in containers with error:" << retval);
 	}
@@ -46,11 +49,11 @@ int componentTest()
 
 	// List Container
 	std::vector<std::wstring> containerList;
-	retval = azureStorageApi.listContainer(containerList);
-	if (retval != EC_SUCCESS)
+	retval = azureStorageApi.listContainers(containerList);
+	if (retval != E_SUCCESS)
 	{
 		LOG_MESSAGE(M_ERROR, __func__, "Failed to list containers with error:" << retval);
 	}
 
-    return 0;
+    return E_SUCCESS;
 }

@@ -1,13 +1,17 @@
 #pragma once
 #include <vector>
 
-// Azure storage header filesss
 #include <was/storage_account.h>
 #include <was/blob.h>
 
 #include "Rule.h"
 #include "Object.h"
 
+/**
+ * Class for invoking Azure Storage REST APIs
+ *
+ * @author Rahul Naik
+ */
 class CAzureStorageApi
 {
 private:
@@ -17,11 +21,23 @@ private:
 public:
 	/**
 	 * CAzureStorageApi
-	 * 
+	 *
+	 * @author Rahul Naik
+	 *
+	 * Default constructor
+	 *
+	 */
+	CAzureStorageApi();
+
+	/**
+	 * CAzureStorageApi
+	 *
 	 * Constructor
 	 *
-	 * Input:
-	 * @param storageAcounntConnectionString  :  Connection string used to access storage account  
+	 * @author Rahul Naik
+	 *
+	 * @param[in] storageAcounntConnectionString  :  Connection string used to access storage account
+	 *
 	 */
 
 	CAzureStorageApi(const std::wstring& storageAcounntConnectionString);
@@ -30,15 +46,15 @@ public:
 	 * CreateBlob
 	 *
 	 * Create blob in container with blob name.
-	 * Uses the  content of source file to create a blob 
+	 * Uses the  content of source file to create a blob
 	 *
-	 * Input:
-	 * @param containerName  :  Name of the container where blob is to be created
-	 * @param blobName       :  Name of the blob to be create
-	 * @param sourceFilePath :  Path of the local file which is to be uplaoded
+	 * @author Rahul Naik
 	 *
-	 * Output:
-	 * @param Return 0 if successful. Error code if it fails
+	 * @param[in] containerName  :  Name of the container where blob is to be created
+	 * @param[in] blobName       :  Name of the blob to be create
+	 * @param[in] sourceFilePath :  Path of the local file which is to be uplaoded
+	 *
+	 * @return: Return E_SUCCESS if successful. Error code if it fails
 	 *
 	 */
 	int createBlob(
@@ -47,18 +63,18 @@ public:
 		const std::wstring& sourceFilePath);
 
 	/**
-	 * listContainer
+	 * listContainers
 	 *
 	 * List the container in the storage account.
 	 *
-	 * Input:
-	 * @param containerList  :  Vector containing name of of all containers in list
+	 * @author Rahul Naik
 	 *
-	 * Output:
-	 * @param Return 0 if successful. Error code if it fails
+	 * @param[out] containerList  :  Vector containing name of of all containers in list
+	 *
+	 * @return: Return E_SUCCESS if successful. Error code if it fails
 	 *
 	 */
-	int listContainer(
+	int listContainers(
 		std::vector<std::wstring>& containerList);
 
 	/**
@@ -66,12 +82,13 @@ public:
 	 *
 	 * List the blobs in the container.
 	 *
-	 * Input:
-	 * @param containerName  :  Name of the container where blobs are stored
-	 * @param blobList       :  Vector containing name of of all blobs in container
+	 * @author Rahul Naik
 	 *
-	 * Output:
-	 * @param Return 0 if successful. Error code if it fails
+	 * Input:
+	 * @param[in]  containerName  :  Name of the container where blobs are stored
+	 * @param[out] blobList       :  Vector containing name of of all blobs in container
+	 *
+	 * @return: Return E_SUCCESS if successful. Error code if it fails
 	 *
 	 */
 	int listBlobs(
@@ -83,21 +100,51 @@ public:
 	 *
 	 * Delete the blob in the container.
 	 *
-	 * Input:
-	 * @param containerName  :  Name of the container where blob is stored
-	 * @param blobName       :  Name of the blob to be deleted
+	 * @author Rahul Naik
 	 *
-	 * Output:
-	 * @param Return 0 if successful. Error code if it fails
+	 * @param[in] containerName  :  Name of the container where blob is stored
+	 * @param[in] blobName       :  Name of the blob to be deleted
+	 *
+	 * @return : Return E_SUCCESS if successful. Error code if it fails
 	 *
 	 */
 	int deleteBlob(
 		const std::wstring& containerName,
 		const std::wstring& blobName);
 
+	/**
+	 * deleteBlobsWhichMatchRules
+	 *
+	 * Delete blobs which matches configured rule in rules file.
+	 *
+	 * @author Rahul Naik
+	 *
+	 * @param[in] containerName  :  Name of the container where blob is stored
+	 * @param[in] ruleList       :  List of rules which is used to check eligibility
+	 *                              of blob for deletion
+	 *
+	 * @return : Return E_SUCCESS if successful. Error code if it fails
+	 *
+	 */
 	int deleteBlobsWhichMatchRules(
 		const std::wstring& containerName,
+		std::vector<CRule*>& rulesList);
+
+	/**
+	 * listBlobsWhichMatchRules
+	 *
+	 * List blobs which matches configured rule in rules file.
+	 *
+	 * @author Rahul Naik
+	 *
+	 * @param[in] containerName  :  Name of the container where blob is stored
+	 * @param[in] ruleList       :  List of rules which is used to check eligibility
+	 *                              of blob for deletion
+	 *
+	 * @return : Return E_SUCCESS if successful. Error code if it fails
+	 *
+	 */
+	int listBlobsWhichMatchRules(
+		const std::wstring& containerName,
 		std::vector<CRule*>& ruleList);
-
 };
-

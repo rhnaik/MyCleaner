@@ -1,10 +1,13 @@
 #include "AzureStorageApi.h"
-#include "ErrorManager.h"
-#include "Logger.h"
+#include "ErrorCode.h"
 
-// Azure storage header filesss
 #include <cpprest/filestream.h>  
 #include <cpprest/containerstream.h>
+#include "Logger.h"
+
+CAzureStorageApi::CAzureStorageApi()
+{
+}
 
 CAzureStorageApi::CAzureStorageApi(const std::wstring& storageAcounntConnectionString)
 {
@@ -23,7 +26,7 @@ int CAzureStorageApi::createBlob(
     const std::wstring& blobName,
     const std::wstring& sourceFilePath)
 {
-    int retValue = EC_SUCCESS;
+    int retValue = E_SUCCESS;
     
     //TODO:: Input validation
     try
@@ -34,7 +37,6 @@ int CAzureStorageApi::createBlob(
 
         // Retrieve reference to a blob
         azure::storage::cloud_block_blob blockBlob =
-            
             container.get_block_blob_reference(blobName);
 
         // Create or overwrite blob with contents from a local file.
@@ -42,21 +44,20 @@ int CAzureStorageApi::createBlob(
     }
     catch (std::exception& e)
     {
-        LOG_MESSAGE(M_ERROR, __func__,
-            "Failed to create blob. Container:[" << containerName
+        std::wcerr << "Failed to create blob. Container:[" << containerName
             << "]. Blob:[" << blobName << "]. Source file path:[" 
-            << sourceFilePath << "]. Error:" << e.what());
-        return EC_FAILED;
+            << sourceFilePath << "]. Error:" << e.what();
+        return E_FAILED;
     }
 
-    LOG_MESSAGE(M_DEBUG, __func__, 
+    BOOST_LOG_TRIVIAL(info) <<
         "Blob created. Container:[" << containerName
-        << "]. Blob:[" << blobName << "]. Source file path:[" << sourceFilePath << "]");
+        << "]. Blob:[" << blobName << "]. Source file path:[" << sourceFilePath << "]";
 
     return retValue;
 }
 
-int CAzureStorageApi::listContainer(std::vector<std::wstring>& containerList)
+int CAzureStorageApi::listContainers(std::vector<std::wstring>& containerList)
 {
     try
     {
@@ -66,17 +67,16 @@ int CAzureStorageApi::listContainer(std::vector<std::wstring>& containerList)
         // Get the list of container using blob client
         for (auto it = m_blobClient.list_containers(); it != endOfResults; ++it)
         {
-            std::wcout << "Container Name:[" << it->name() << "]" << std::endl;
             containerList.push_back(it->name());
         }
     }
     catch (std::exception& e)
     {
-        LOG_MESSAGE(M_ERROR, __func__,
-            "Failed to list containers." << ". Error:" << e.what());
-        return EC_FAILED;
+        std::wcerr << "Failed to list containers." << ". Error:" << e.what();
+        return E_FAILED;
     }
-    return 0;
+
+    return E_SUCCESS;
 }
 
 int CAzureStorageApi::listBlobs(
@@ -97,22 +97,21 @@ int CAzureStorageApi::listBlobs(
         {
             if (it->is_blob())
             {
-                std::wcout << U("Blob: ") << it->as_blob().uri().primary_uri().to_string() << std::endl;
+                std::wcout << ("Blob: ") << it->as_blob().uri().primary_uri().to_string() << std::endl;
             }
             else
             {
-                std::wcout << U("Directory: ") << it->as_directory().uri().primary_uri().to_string() << std::endl;
+                std::wcout << ("Directory: ") << it->as_directory().uri().primary_uri().to_string() << std::endl;
             }
         }
     }
     catch (std::exception& e)
     {
-        LOG_MESSAGE(M_ERROR, __func__,
-            "Failed to list blobs. Container:[" << containerName << ". Error:" << e.what());
-        return EC_FAILED;
+        std::wcerr << "Failed to list blobs. Container:[" << containerName << ". Error:" << e.what();
+        return E_FAILED;
     }
 
-    return EC_SUCCESS;
+    return E_SUCCESS;
 }
 
 int CAzureStorageApi::deleteBlob(
@@ -134,16 +133,14 @@ int CAzureStorageApi::deleteBlob(
     }
     catch (std::exception& e)
     {
-        LOG_MESSAGE(M_ERROR, __func__,
-            "Failed to delete blob. Container:[" 
-            << containerName.c_str() << "]. Blob:[" << blobName.c_str() << "]. Error:" << e.what());
-        return EC_FAILED;
+        std::wcerr << "Failed to delete blob. Container:["
+            << containerName.c_str() << "]. Blob:[" << blobName.c_str() << "]. Error:" << e.what();
+        return E_FAILED;
     }
 
-    LOG_MESSAGE(M_DEBUG, __func__,
-        "Blob deleted. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "]." );
+    BOOST_LOG_TRIVIAL(info) << "Blob deleted. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].";
 
-    return EC_SUCCESS;
+    return E_SUCCESS;
 }
 
 int CAzureStorageApi::deleteBlobsWhichMatchRules(
@@ -171,23 +168,72 @@ int CAzureStorageApi::deleteBlobsWhichMatchRules(
                 if ((*rule)->checkRule(blobObject))
                 { 
                     deleteBlob(containerName, blobName);
-                    LOG_MESSAGE(M_DEBUG, __func__,
-                        "Blob deleted. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].");
+                    BOOST_LOG_TRIVIAL(debug) <<
+                        "Blob deleted. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].";
                 }
                 else
                 {
-                    LOG_MESSAGE(M_DEBUG, __func__,
-                        "Rule check:[FAIL]. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].");
+                    BOOST_LOG_TRIVIAL(info) << "Rule check:[FAIL]. Container:[" << containerName.c_str() << "]. "
+                        << "Blob name[" << blobName.c_str() << "].";
                 }
             }
         }
     }
     catch (std::exception& e)
     {
-        LOG_MESSAGE(M_DEBUG, __func__,
-            "Failed to delete blobs. Container:[" << containerName.c_str() << "]. " << " Error:[" << e.what() << "].");
-        return EC_FAILED;
+        std::wcerr << "Failed to delete blobs. Container:[" << containerName.c_str() << "]. " << " Error:[" << e.what() << "].";
+        return E_FAILED;
     }
 
-    return EC_SUCCESS;
+    return E_SUCCESS;
+}
+
+int CAzureStorageApi::listBlobsWhichMatchRules(
+    const std::wstring& containerName,
+    std::vector<CRule*>& ruleList)
+{
+    //TODO:: Input validation
+    try
+    {
+        // Retrieve a reference to a container.
+        azure::storage::cloud_blob_container container =
+            m_blobClient.get_container_reference(containerName);
+
+        // Output URI of each item.
+        azure::storage::list_blob_item_iterator endOfResults;
+
+        std::wcout << "------------------------------------------" << std::endl;
+        std::wcout << "|       List of eligible blobs            |" << std::endl;
+        std::wcout << "------------------------------------------" << std::endl;
+
+        for (auto it = container.list_blobs(); it != endOfResults; ++it)
+        {
+            std::wstring blobName = it->as_blob().name().c_str();
+
+            CObject blobObject(blobName, it->as_blob().properties().last_modified().utc_timestamp());
+
+            for (auto rule = ruleList.begin(); rule != ruleList.end(); ++rule)
+            {
+                if ((*rule)->checkRule(blobObject))
+                {
+                    std::wcout << blobName.c_str() << std::endl;
+                    BOOST_LOG_TRIVIAL(info) <<
+                        "Eligible Blob. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].";
+                }
+                else
+                {
+                    BOOST_LOG_TRIVIAL(info) <<
+                        "Rule check:[FAIL]. Container:[" << containerName.c_str() << "]. " << "Blob name[" << blobName.c_str() << "].";
+                }
+            }
+        }
+        std::wcout << "------------------------------------------" << std::endl;
+    }
+    catch (std::exception& e)
+    {
+        std::wcerr << "Failed to delete blobs. Container:[" << containerName.c_str() << "]. " << " Error:[" << e.what() << "].";
+        return E_FAILED;
+    }
+
+    return E_SUCCESS;
 }

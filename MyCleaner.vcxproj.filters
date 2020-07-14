@@ -43,7 +43,13 @@
     <ClCompile Include="AzureStorageConfiguration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentTest.cpp">
+    <ClCompile Include="CommandLineOptionsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RulePatternCheck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RuleCheckLastModifiedTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,9 +58,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyCleaner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
@@ -69,13 +72,16 @@
     <ClInclude Include="Rule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AzureStorageConfiguration.h">
+    <ClInclude Include="CommandLineOptionsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentTest.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="ErrorCode.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Defines.h">
+    <ClInclude Include="RulePatternCheck.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RuleCheckLastModifiedTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

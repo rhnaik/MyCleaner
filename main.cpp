@@ -1,71 +1,64 @@
 
-#include <boost/program_options.hpp>
-#include <iostream>
 
-#include "AzureStorageApi.h"
+#include <iostream>
+#include "MyCleaner.h"
 #include "Logger.h"
-#include "ErrorManager.h"
-#include "Rule.h"
-#include "Defines.h"
+#include "ErrorCode.h"
+#include "CommandLineOptionsManager.h"
 
 int main(int argc, const char*argv[])
 {
     try
     {
-        // Parse Command line options
-        boost::program_options::options_description desc{ "Options" };
-        desc.add_options()
-            ("help,h", "Help Screen")
-            ("config_file_path, cnf", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE_PATH), "Config File Path")
-            ("rules_file_path, rfp", boost::program_options::value<std::string>()->default_value(DEFAULT_RULES_FILE_PATH), "Rule File Path")
-            ("instance_name, in", boost::program_options::value<std::string>()->default_value(DEFAULT_INSTANCE_NAME), "Instance Name")
-            ("instance_type, it", boost::program_options::value<int>()->default_value(DEFAULT_INTANCE_TYPE), "Instance Type");
+        int retval = E_SUCCESS;
 
-        // Variables for storing command line options
-        std::string configFilePath;
-        std::string rulesFilePath;
-        std::string instanceName;
-        int instanceType;
-
-        boost::program_options::variables_map variablesMap;
-        store(parse_command_line(argc, argv, desc), variablesMap);
-
-        notify(variablesMap);
-
-        // Extract command line options values
-        if (variablesMap.count("help"))
+        // Parse input arguments
+        CCommandLineOptionsManager cliOptionsManager;
+        retval = cliOptionsManager.initializeArgumentValues(argc, argv);
+        if (retval != E_SUCCESS)
         {
-            std::cout << desc;
-        }
-        
-        if (variablesMap.count("config_file_path"))
-        {
-            configFilePath = variablesMap["config_file_path"].as<std::string>();
-            std::cout << "config_file_path:" <<configFilePath << std::endl;    
+            std::cerr << "Failed to initialize arguments. Error:[" << retval << "]";
+            exit(retval);
         }
 
-        if (variablesMap.count("rules_file_path"))
+        // Validate arguments
+        retval = cliOptionsManager.validateArguments();
+        if (retval != E_SUCCESS)
         {
-            rulesFilePath = variablesMap["rules_file_path"].as<std::string>();
-            std::cout << "rules_file_path:" << rulesFilePath << std::endl;
+            std::cerr << "Failed to validate arguments. Error:[" << retval << "]";
+            exit(retval);
         }
-        
-        if (variablesMap.count("instance_name"))
+
+        // Factory function to get Cleaner instance
+        std::unique_ptr<CMyCleaner> myCleanerInstance(createMyCleanerInstance(cliOptionsManager.getCleanerInstanceType()));
+
+        // Load configuration of specific instance from configuration file
+        retval = myCleanerInstance->loadConfiguration(
+            cliOptionsManager.getInstanceName(),
+            cliOptionsManager.getConfigFilePath());
+
+        if (retval != E_SUCCESS)
         {
-            instanceName = variablesMap["instance_name"].as<std::string>();
-            std::cout << "instance_name:" << instanceName << std::endl;
+            std::cerr << "Failed to read configuration for instance. Error:[" << retval << "]";
+            exit(retval);
         }
-        
-        if (variablesMap.count("instance_type"))
+
+        // Initialize rule list from rules JSON file
+        retval = myCleanerInstance->intitializeRulesList(cliOptionsManager.getRulesFilePath());
+        if (retval != E_SUCCESS)
         {
-            instanceType = variablesMap["instance_type"].as<int>();
-            std::cout << "instance_type:" << instanceType << std::endl;
+            std::cerr << "Failed to read configuration for instance. Error:[" << retval << "]";
+            exit(retval);
         }
+
+        // Cleanup objects based on configures rules
+        retval = myCleanerInstance->cleanElgibileObjectList(cliOptionsManager.getPreviewFlag());
     }
-    catch (const std::exception& ex)
+    catch (std::exception& e)
     {
-        std::cerr << "Failed to parse input arguments. Error:" << ex.what() << '\n';
+        std::cerr << "Exception caught. Error:[" << e.what() << "]";
+        exit(E_FAILED);
     }
-
-	return 0;
+    
+	return E_SUCCESS;
 }

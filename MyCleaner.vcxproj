@@ -142,25 +142,27 @@
     <ClCompile Include="AzureStorageConfiguration.cpp" />
     <ClCompile Include="AzureStorageBlobCleaner.cpp" />
     <ClCompile Include="AzureStorageApi.cpp" />
-    <ClCompile Include="ComponentTest.cpp" />
+    <ClCompile Include="CommandLineOptionsManager.cpp" />
     <ClCompile Include="Rule.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyCleaner.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="RuleCheckLastModifiedTime.cpp" />
+    <ClCompile Include="RulePatternCheck.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AzureStorageConfiguration.h" />
     <ClInclude Include="AzureStorageBlobCleaner.h" />
     <ClInclude Include="AzureStorageApi.h" />
-    <ClInclude Include="ComponentTest.h" />
-    <ClInclude Include="Defines.h" />
+    <ClInclude Include="CommandLineOptionsManager.h" />
+    <ClInclude Include="RuleCheckLastModifiedTime.h" />
+    <ClInclude Include="RulePatternCheck.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="ErrorManager.h" />
+    <ClInclude Include="ErrorCode.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MyCleaner.h" />
     <ClInclude Include="Rule.h" />
@@ -172,6 +174,20 @@
     <Import Project="packages\boost_system-vc140.1.72.0.0\build\boost_system-vc140.targets" Condition="Exists('packages\boost_system-vc140.1.72.0.0\build\boost_system-vc140.targets')" />
     <Import Project="packages\boost_program_options-vc141.1.72.0.0\build\boost_program_options-vc141.targets" Condition="Exists('packages\boost_program_options-vc141.1.72.0.0\build\boost_program_options-vc141.targets')" />
     <Import Project="packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets" Condition="Exists('packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" />
+    <Import Project="packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets" Condition="Exists('packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets')" />
+    <Import Project="packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets" Condition="Exists('packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets')" />
+    <Import Project="packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets" Condition="Exists('packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets')" />
+    <Import Project="packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets" Condition="Exists('packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets')" />
+    <Import Project="packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets" Condition="Exists('packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets')" />
+    <Import Project="packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets" Condition="Exists('packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets')" />
+    <Import Project="packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets" Condition="Exists('packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets')" />
+    <Import Project="packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets" Condition="Exists('packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets')" />
+    <Import Project="packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets" Condition="Exists('packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets')" />
+    <Import Project="packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets" Condition="Exists('packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets')" />
+    <Import Project="packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" />
+    <Import Project="packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets" Condition="Exists('packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" />
+    <Import Project="packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets" Condition="Exists('packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" />
+    <Import Project="packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets" Condition="Exists('packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -182,5 +198,19 @@
     <Error Condition="!Exists('packages\boost_system-vc140.1.72.0.0\build\boost_system-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_system-vc140.1.72.0.0\build\boost_system-vc140.targets'))" />
     <Error Condition="!Exists('packages\boost_program_options-vc141.1.72.0.0\build\boost_program_options-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_program_options-vc141.1.72.0.0\build\boost_program_options-vc141.targets'))" />
     <Error Condition="!Exists('packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_date_time-vc141.1.72.0.0\build\boost_date_time-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_filesystem-vc141.1.72.0.0\build\boost_filesystem-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_log-vc141.1.72.0.0\build\boost_log-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_system-vc141.1.72.0.0\build\boost_system-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_thread-vc141.1.72.0.0\build\boost_thread-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_chrono-vc141.1.72.0.0\build\boost_chrono-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_log_setup-vc141.1.72.0.0\build\boost_log_setup-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_atomic-vc141.1.72.0.0\build\boost_atomic-vc141.targets'))" />
+    <Error Condition="!Exists('packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_log-vc142.1.72.0.0\build\boost_log-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_log_setup-vc142.1.72.0.0\build\boost_log_setup-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets'))" />
   </Target>
 </Project>
